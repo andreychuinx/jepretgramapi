@@ -1,8 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt')
-mongoose.connect('mongodb://localhost:27017/jepret')
-mongoose.Promise = global.Promise;
 
 var shareSchema = new Schema({
   idPhoto : {

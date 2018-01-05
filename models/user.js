@@ -1,8 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt')
-mongoose.connect('mongodb://localhost:27017/jepret')
-mongoose.Promise = global.Promise;
 
 var userSchema = new Schema({
   name : String,
@@ -16,14 +14,21 @@ var userSchema = new Schema({
   },
   password : String,
   follows : [{
-    userId : {
-      type : Schema.Types.ObjectId,
-      ref : 'User'
-    }
+    type : Schema.Types.ObjectId,
+    ref : 'User'
   }]
 }, { timestamps : {} })
 
 userSchema.pre('save', function (next) {
+  bcrypt.hash(this.password, 10)
+  .then(hash =>{
+    this.password = hash
+    next()
+  })
+  .catch(err => next(err))
+})
+
+userSchema.pre('update', function (next) {
   bcrypt.hash(this.password, 10)
   .then(hash =>{
     this.password = hash

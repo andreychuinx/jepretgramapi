@@ -24,6 +24,8 @@ class UserController {
 
   static getSingle(req, res) {
     UserModel.findById(req.params.id)
+    .populate('follows')
+    .exec()
       .then(result => {
         res.status(HttpStatus.OK).json({
           messages: "Data Single User",
@@ -64,12 +66,8 @@ class UserController {
   }
 
   static update(req, res) {
-    let options = {
-      ...authorization(req)
-    }
-    options.new = true
-    let { name, email, password, role } = req.body
-    UserModel.findByIdAndUpdate(req.params.id, { name, email, password, role }, options)
+    let { name, email, password, follows } = req.body
+    UserModel.findByIdAndUpdate(req.params.id, { name, email, password, follows }, {new : true})
       .then(result => {
         res.status(HttpStatus.OK).json({
           messages: "User Updated",
@@ -85,6 +83,36 @@ class UserController {
       })
   }
 
+  static follow(req, res) {
+    let follow = req.body.follow
+    UserModel.findById(req.params.id)
+    .then(user => {
+      let query = {}
+      let indexFollow = user.follows.find(followedUser => followedUser == follow)
+      if(indexFollow == undefined){
+        query.$push = {
+          follows: follow
+        }
+      }else{
+        query.$pull = {
+          follows : follow
+        }
+      }
+      UserModel.findByIdAndUpdate(req.params.id, query, { new : true})
+      .then(result => {
+        return result
+        .populate('follows')
+        .execPopulate()
+      })
+      .then(result =>{
+        res.status(HttpStatus.OK).json({
+          messages: 'Followed',
+          data: result
+        })
+      })
+    })
+  }
+
   static destroy(req, res) {
     let options = {
       ...authorization(req)
@@ -98,6 +126,7 @@ class UserController {
         })
       })
   }
+
 }
 
 module.exports = UserController

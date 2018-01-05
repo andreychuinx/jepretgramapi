@@ -1,8 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt')
-mongoose.connect('mongodb://localhost:27017/jepret')
-mongoose.Promise = global.Promise;
 
 var photoSchema = new Schema({
   name : String,
@@ -14,6 +12,17 @@ var photoSchema = new Schema({
   likes : [{
     type : Schema.Types.ObjectId,
     ref : 'User'
+  }],
+  comments : [{
+    _id : {
+      type : Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    comment : String,
+    createdComment : {
+      type : Date,
+      default : Date.now
+    }
   }],
   caption : String,
 }, { timestamps : {} })

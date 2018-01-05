@@ -25,6 +25,7 @@ class SignInController {
                   name: result.name,
                   username : result.username,
                   email: result.email,
+                  follows : result.follows
                 }
                 
                 jwt.sign(objPayLoad, process.env.SECRET_KEY, (err, token) => {
